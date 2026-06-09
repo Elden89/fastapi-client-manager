@@ -1,0 +1,31 @@
+# FastAPI Client Manager
+
+REST API для управления клиентами.
+
+## Стек
+- Python
+- FastAPI
+- PostgreSQL
+- SQLAlchemy
+
+## Endpoints
+- `GET /clients` — все клиенты
+- `GET /clients/{id}` — клиент по id
+- `POST /clients` — создать клиента
+- `PUT /clients/{id}` — обновить клиента
+- `DELETE /clients/{id}` — удалить клиента
+
+## Запуск
+```bash
+pip install -r requirements.txt
+uvicorn fast:app --reload
+```
+
+Создай файл `.env`:
+```
+DB_USER=...
+DB_PASSWORD=...
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=...
+```
