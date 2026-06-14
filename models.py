@@ -8,4 +8,10 @@ class Client(Base):
     phone  = Column(String(20), nullable=False, unique=True)
     budget = Column(Integer, nullable=False)
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True)
+    username = Column(String(50), unique = True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+
 Base.metadata.create_all(engine)

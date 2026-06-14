@@ -15,3 +15,11 @@ class ClientUpdate(BaseModel):
     name: str | None = None
     phone: str | None = None 
     budget: int | None = None
+
+class UserCreate(BaseModel):
+    username: str
+    password: str
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str

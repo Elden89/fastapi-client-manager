@@ -1,8 +1,10 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy.orm import Session
 from database import engine
 import models
-from schemas import ClientCreate, ClientResponse, ClientUpdate
+from schemas import ClientCreate, ClientResponse, ClientUpdate, UserCreate, Token
+from auth import hash_password, verify_password, create_access_token, get_current_user
+from fastapi.security import OAuth2PasswordRequestForm
 
 app = FastAPI()
 
@@ -11,7 +13,7 @@ def root():
     return {"message": "Привет"}
 
 @app.post("/clients", response_model=ClientResponse)
-def create_client(client: ClientCreate):
+def create_client(client: ClientCreate, current_user: str = Depends(get_current_user)):
     with Session(engine) as session:
         new_client = models.Client(
             name=client.name, 
@@ -64,4 +66,25 @@ def update_client(client_id: int, client_data: ClientUpdate):
         session.refresh(client)
         return client
 
-        
+@app.post("/register")
+def register(user_data: UserCreate):
+    with Session(engine) as session:
+        existing_user = session.query(models.User).filter_by(username=user_data.username).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Пользователь уже существует!")
+        new_user = models.User(
+            username=user_data.username,
+            hashed_password=hash_password(user_data.password)    
+        )
+        session.add(new_user)
+        session.commit()
+        return {"message": f"Пользователь {user_data.username} зарегистрирован!"}
+
+@app.post("/login", response_model=Token)
+def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    with Session(engine) as session:
+        user = session.query(models.User).filter_by(username=form_data.username).first()
+        if not user or not verify_password(form_data.password, user.hashed_password):
+            raise HTTPException(status_code=401, detail="Неверный логин или пароль")
+        token = create_access_token({"sub": user.username})
+        return {"access_token": token, "token_type": "bearer"}
