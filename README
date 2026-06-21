@@ -20,11 +20,13 @@ REST API for client management.
 pip install -r requirements.txt
 uvicorn fast:app --reload
 
-Создай файл `.env`:
+Create file `.env`:
 ```
 DB_USER=...
 DB_PASSWORD=...
 DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=...
+DATABASE_URL=
+SECRET_KEY=
 ```
